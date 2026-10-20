@@ -1,0 +1,16 @@
+{
+  "name": "hirameki-shosai",
+  "title": "ひらめき書斎",
+  "siteUrl": "https://minolu-29.github.io/hirameki-shosai/",
+  "customDomain": "",
+  "contact": "",
+  "web": {
+    "adsenseClient": "",
+    "adTest": true,
+    "adFrequency": "120s",
+    "ga4": ""
+  },
+  "gamedistribution": {
+    "gameId": ""
+  }
+}

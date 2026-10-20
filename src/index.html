@@ -4,17 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>ひらめき書斎｜1問で頭が冴える知的ゲーム10</title>
+<!--WEB-HEAD-->
 <meta name="description" content="テンパズル・数列・ミニ数独・ライツアウト・8パズル・数字記憶・論理推理・2バック・図形回転・マインスイーパー。大人向けの知的ゲーム10本。">
 <meta name="theme-color" content="#f4efe4">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ひらめき書斎｜1問で頭が冴える知的ゲーム10">
 <meta property="og:description" content="すきま時間に解ける、ちょっと手ごわい知的ゲーム10本。">
-<meta property="og:image" content="https://minolu-29.github.io/hirameki-shosai/og.png">
-<meta property="og:url" content="https://minolu-29.github.io/hirameki-shosai/">
+<meta property="og:image" content="%SITE_URL%og.png">
+<meta property="og:url" content="%SITE_URL%">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
+<!--/WEB-HEAD-->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>/* ひらめき書斎: 罫線入りの原稿用紙と藍インク、朱の判子。見出しは明朝、数字は等幅 */
 :root{
@@ -85,6 +87,7 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .btn.dark{background:var(--ink);color:var(--paper)}
 .next{font-size:13px;font-weight:700;color:var(--muted)}
 .next button{cursor:pointer;background:none;border:0;padding:0;font-weight:800;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.langs a{color:var(--muted);font-size:13px;font-weight:700;padding:4px 8px}
 
 /* シェア */
 .sheet-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40;display:flex;align-items:flex-end;justify-content:center;padding:12px}
@@ -131,7 +134,12 @@ h1,h2,h3{font-weight:800}
 .cell{border-radius:6px;font-family:"IBM Plex Mono",monospace;font-weight:600}
 .choice{border-radius:8px}
 .ov .newbest{border-radius:4px}
+body{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.on-portal .foot{display:none}
+.langs{text-align:center;margin:0}
+.langs button{cursor:pointer;background:none;border:0;padding:4px 8px;color:var(--muted);font-weight:700;font-size:13px;text-decoration:underline;text-underline-offset:3px}
 </style>
+<!--PLATFORM-->
 </head>
 <body>
 <div class="wrap">
@@ -143,6 +151,7 @@ h1,h2,h3{font-weight:800}
     </header>
     <div class="shelf" id="shelf"></div>
     <p class="foot">記録はこの端末のブラウザにだけ保存されます</p>
+    <p class="langs"><button type="button" id="lang">English</button><!--PRIVACY-LINK--></p>
   </section>
 
   <section id="play" hidden>
@@ -159,8 +168,38 @@ h1,h2,h3{font-weight:800}
   </section>
 </div>
 
-<script>const BRAND = {
-  name: "ひらめき書斎", title: "ひらめき書斎｜1問で頭が冴える知的ゲーム10", hashtag: "ひらめき書斎", slug: "shosai", prefix: "hs-",
+<script>
+(window.PLATFORM && window.PLATFORM.init ? window.PLATFORM.init() : Promise.resolve()).then(() => {
+/* 言語: ?lang=en / 前回の選択 / ブラウザの言語 の順で決める。日本語以外は英語 */
+const LANG = (() => {
+  try { const q = new URLSearchParams(location.search).get("lang"); if (q) return q === "ja" ? "ja" : "en"; } catch (e) {}
+  try { const s = localStorage.getItem("lang"); if (s) return s; } catch (e) {}
+  if (window.PLATFORM && window.PLATFORM.lang) return window.PLATFORM.lang;
+  return /^ja\b/i.test(navigator.language || "") ? "ja" : "en";
+})();
+const EN = LANG !== "ja";
+const tr = (ja, en) => EN ? en : ja;
+/* HTMLに直接書いてある文字の英語版と、言語の切り替え */
+(() => {
+  const q = sel => document.querySelector(sel);
+  if (EN) {
+    document.documentElement.lang = "en";
+    q(".hero .tag").textContent = "5 minutes a day · Brain workout for adults";
+    q(".hero h1").innerHTML = "Hirameki <span>Study</span>";
+    q(".hero p").textContent = "Make 10, number sequences, sudoku, logic puzzles. 10 tricky brain games for your spare moments.";
+    q(".foot").textContent = "Your records are saved only in this browser";
+    q("#back").textContent = "‹ Home";
+  }
+  const btn = q("#lang");
+  btn.textContent = EN ? "日本語" : "English";
+  btn.onclick = () => {
+    const next = EN ? "ja" : "en";
+    try { localStorage.setItem("lang", next); } catch (e) {}
+    const u = new URL(location.href); u.searchParams.set("lang", next); location.replace(u.href);
+  };
+})();
+const BRAND = {
+  name: tr("ひらめき書斎", "Hirameki Study"), title: tr("ひらめき書斎｜1問で頭が冴える知的ゲーム10", "Hirameki Study | 10 Brain Puzzles to Sharpen Your Mind"), hashtag: tr("ひらめき書斎", "HiramekiStudy"), slug: "shosai", prefix: "hs-",
   fd: '"Shippori Mincho B1","Hiragino Mincho ProN",serif', fb: '"Zen Kaku Gothic New","Hiragino Sans",sans-serif',
   c: { bg: "#fbf8f1", ink: "#1f2a3a", muted: "#6b6457", line: "#1f2a3a", accent: "#c4452f", soft: "#efe8d8" },
   card: { bg: "#f4efe4", dot: "rgba(31,42,58,.07)", panel: "#fbf8f1", ink: "#1f2a3a", muted: "#6b6457", foot: "#c4452f", shadow: "rgba(31,42,58,.15)", font: '"Shippori Mincho B1","Hiragino Mincho ProN",serif' },
@@ -175,12 +214,16 @@ const ri = (a, b) => Math.floor(rnd(a, b + 1));
 const pick = a => a[Math.floor(Math.random() * a.length)];
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const store = (k, v) => { try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || "null"); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } };
+const PF = window.PLATFORM || {};
+const _ls = () => PF.storage || localStorage;
+const store = (k, v) => { try { if (v === undefined) return JSON.parse(_ls().getItem(k) || "null"); _ls().setItem(k, JSON.stringify(v)); } catch (e) { return null; } };
+const adGate = fn => PF.midgame ? PF.midgame(fn) : fn();
+const track = (name, params) => { try { PF.track && PF.track(name, params); } catch (e) {} };
 
 /* ---------- 効果音 ---------- */
 let AC = null, muted = !!store(BRAND.prefix + "mute");
 function beep(freq = 660, dur = 0.08, type = "sine", vol = 0.12) {
-  if (muted) return;
+  if (muted || PF.adPlaying) return;
   try {
     AC = AC || new (window.AudioContext || window.webkitAudioContext)();
     if (AC.state === "suspended") AC.resume();
@@ -219,9 +262,11 @@ const rankOf = (g, s) => (g.lower ? g.ranks.find(r => s <= r[0]) : g.ranks.find(
 function renderHub() {
   $("#shelf").innerHTML = GAMES.map((g, i) => {
     const b = bestOf(g);
-    return `<button class="card" type="button" data-g="${g.id}">
+    return tr(`<button class="card" type="button" data-g="${g.id}">
       <span class="badge" style="background:${g.color}"><small>${String(i + 1).padStart(2, "0")}</small>${g.glyph}</span>
-      <b>${esc(g.name)}</b><span class="best">${b === null ? "まだ遊んでない" : "ベスト " + esc(g.fmt(b))}</span></button>`;
+      <b>${esc(g.name)}</b><span class="best">${b === null ? "まだ遊んでない" : "ベスト " + esc(g.fmt(b))}</span></button>`, `<button class="card" type="button" data-g="${g.id}">
+      <span class="badge" style="background:${g.color}"><small>${String(i + 1).padStart(2, "0")}</small>${g.glyph}</span>
+      <b>${esc(g.name)}</b><span class="best">${b === null ? "Not played yet" : "Best " + esc(g.fmt(b))}</span></button>`);
   }).join("");
 }
 $("#shelf").addEventListener("click", e => { const c = e.target.closest("[data-g]"); if (c) go(c.dataset.g); });
@@ -239,13 +284,15 @@ function go(id) {
   try { if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id); } catch (e) {}
   $("#hub").hidden = true; $("#play").hidden = false; document.body.classList.add("playing");
   document.documentElement.style.setProperty("--gc", g.color);
-  $("#g-title").textContent = g.name; document.title = g.name + "｜" + BRAND.name;
+  $("#g-title").textContent = g.name; document.title = g.name + tr("｜", " | ") + BRAND.name;
   $("#stage").innerHTML = ""; hud("", ""); stageSize();
   const b = bestOf(g);
   const ov = $("#ov");
-  ov.innerHTML = `<h2>${esc(g.name)}</h2><p class="how">${g.how}</p>
+  ov.innerHTML = tr(`<h2>${esc(g.name)}</h2><p class="how">${g.how}</p>
     ${b === null ? "" : `<p class="sub">ベスト ${esc(g.fmt(b))}</p>`}
-    <button class="btn" type="button" id="start">スタート</button>`;
+    <button class="btn" type="button" id="start">スタート</button>`, `<h2>${esc(g.name)}</h2><p class="how">${g.how}</p>
+    ${b === null ? "" : `<p class="sub">Best ${esc(g.fmt(b))}</p>`}
+    <button class="btn" type="button" id="start">Start</button>`);
   ov.hidden = false; $("#start").onclick = start; $("#start").focus({ preventScroll: true });
   window.scrollTo(0, 0);
 }
@@ -262,6 +309,8 @@ function start() {
   const g = cur, stage = $("#stage");
   stage.innerHTML = ""; $("#ov").hidden = true; stageSize();
   beep(1, 0.001, "sine", 0.0001); // 音を使えるようにする
+  if (PF.gameplayStart) PF.gameplayStart();
+  track("game_start", { game: g.id });
   const subs = [];
   let alive = true, ended = false;
   ctx = {
@@ -294,32 +343,42 @@ function start() {
     },
     end(score) {
       if (ended) return; ended = true; alive = false; subs.forEach(f => f()); subs.length = 0;
+      if (PF.gameplayStop) PF.gameplayStop();
       setTimeout(() => finish(g, score), 450);
     },
-    kill() { alive = false; ended = true; subs.forEach(f => f()); subs.length = 0; },
+    kill() { if (alive && PF.gameplayStop) PF.gameplayStop(); alive = false; ended = true; subs.forEach(f => f()); subs.length = 0; },
     get alive() { return alive; },
   };
   g.play(ctx);
 }
 
 function finish(g, score) {
+  const prevBest = bestOf(g);
   const isBest = saveBest(g, score);
+  if (isBest && prevBest !== null && PF.happy) PF.happy();
+  track("game_end", { game: g.id, score });
   const [, rank] = rankOf(g, score);
   const b = bestOf(g);
   isBest ? sfx.win() : sfx.over();
   const others = GAMES.filter(x => x.id !== g.id), nx = pick(others);
   const ov = $("#ov");
-  ov.innerHTML = `${isBest ? `<span class="newbest">ベスト更新！</span>` : ""}
+  ov.innerHTML = tr(`${isBest ? `<span class="newbest">ベスト更新！</span>` : ""}
     <div class="score">${esc(g.fmt(score))}</div>
     <div class="rank">${esc(rank)}</div>
     <p class="sub">ベスト ${esc(g.fmt(b))}</p>
     <div class="btns"><button class="btn" type="button" id="again">もう一回</button>
-      <button class="btn sub" type="button" id="share">画像でシェア</button></div>
-    <p class="next">次はこれ → <button type="button" id="nx">${esc(nx.name)}</button></p>`;
+      ${PF.noShare ? "" : `<button class="btn sub" type="button" id="share">画像でシェア</button>`}</div>
+    <p class="next">次はこれ → <button type="button" id="nx">${esc(nx.name)}</button></p>`, `${isBest ? `<span class="newbest">NEW BEST!</span>` : ""}
+    <div class="score">${esc(g.fmt(score))}</div>
+    <div class="rank">${esc(rank)}</div>
+    <p class="sub">Best ${esc(g.fmt(b))}</p>
+    <div class="btns"><button class="btn" type="button" id="again">Play again</button>
+      ${PF.noShare ? "" : `<button class="btn sub" type="button" id="share">Share image</button>`}</div>
+    <p class="next">Try next → <button type="button" id="nx">${esc(nx.name)}</button></p>`);
   ov.hidden = false;
-  $("#again").onclick = start; $("#again").focus({ preventScroll: true });
-  $("#share").onclick = () => share(g, score, rank, isBest);
-  $("#nx").onclick = () => go(nx.id);
+  $("#again").onclick = () => adGate(start); $("#again").focus({ preventScroll: true });
+  if ($("#share")) $("#share").onclick = () => share(g, score, rank, isBest);
+  $("#nx").onclick = () => adGate(() => go(nx.id));
 }
 
 /* ---------- 結果画像とシェア ---------- */
@@ -343,22 +402,27 @@ async function card(g, score, rank, isBest) {
   x.fillStyle = K.ink; fit(x, g.fmt(score), 820, 180, FDc); x.fillText(g.fmt(score), 540, 850);
   rr(x, 230, 900, 620, 130, 65); x.fillStyle = g.color; x.fill(); x.lineWidth = 6; x.stroke();
   x.fillStyle = K.glyphInk || K.ink; fit(x, rank, 560, 66, FDc); x.fillText(rank, 540, 988);
-  x.fillStyle = K.muted; x.font = `800 38px ${FB}`; x.fillText(isBest ? "ベスト更新！あなたは何点いける？" : "あなたは何点いける？", 540, 1120);
+  x.fillStyle = K.muted; x.font = `800 38px ${FB}`; x.fillText(isBest ? tr("ベスト更新！あなたは何点いける？", "New best! Can you beat it?") : tr("あなたは何点いける？", "Can you beat it?"), 540, 1120);
   x.fillStyle = K.foot || K.ink; x.font = `800 38px ${FB}`; x.fillText("#" + BRAND.hashtag, 540, 1290);
   return c;
 }
 const pageURL = () => { try { return location.origin + location.pathname + "#" + (cur ? cur.id : ""); } catch (e) { return ""; } };
 async function share(g, score, rank, isBest) {
   const c = await card(g, score, rank, isBest);
-  const text = `${BRAND.name}「${g.name}」で${g.fmt(score)}！「${rank}」\nあなたは何点いける？ #${BRAND.hashtag}`;
+  const text = tr(`${BRAND.name}「${g.name}」で${g.fmt(score)}！「${rank}」\nあなたは何点いける？ #${BRAND.hashtag}`, `I scored ${g.fmt(score)} on "${g.name}" in ${BRAND.name}! Rank: ${rank}\nCan you beat it? #${BRAND.hashtag}`);
   const url = pageURL(), full = url.startsWith("http") ? text + "\n" + url : text;
   const ov = document.createElement("div"); ov.className = "sheet-ov";
-  ov.innerHTML = `<div class="sheet" role="dialog" aria-label="結果をシェア">
+  ov.innerHTML = tr(`<div class="sheet" role="dialog" aria-label="結果をシェア">
     <img alt="結果画像" src="${c.toDataURL("image/png")}">
     <p class="note">画像を長押し（パソコンは右クリック）でも保存できるよ</p>
     <div class="btns"><button class="btn" type="button" data-s>保存・シェア</button>
       <a class="btn dark" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(full)}">Xでシェア</a></div>
-    <div class="btns"><button class="btn sub" type="button" data-x>とじる</button></div></div>`;
+    <div class="btns"><button class="btn sub" type="button" data-x>とじる</button></div></div>`, `<div class="sheet" role="dialog" aria-label="Share your result">
+    <img alt="Result image" src="${c.toDataURL("image/png")}">
+    <p class="note">You can also long-press (right-click on PC) the image to save it</p>
+    <div class="btns"><button class="btn" type="button" data-s>Save / Share</button>
+      <a class="btn dark" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(full)}">Share on X</a></div>
+    <div class="btns"><button class="btn sub" type="button" data-x>Close</button></div></div>`);
   document.body.appendChild(ov);
   ov.addEventListener("click", e => { if (e.target === ov || e.target.closest("[data-x]")) ov.remove(); });
   ov.querySelector("[data-s]").onclick = () => c.toBlob(async blob => {
@@ -366,14 +430,14 @@ async function share(g, score, rank, isBest) {
     const file = new File([blob], `${BRAND.slug}-${g.id}.png`, { type: "image/png" });
     try { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text: full }); return; } }
     catch (e) { if (e && e.name === "AbortError") return; }
-    try { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); toast("保存したよ！"); }
-    catch (e) { toast("画像を長押しして保存してね"); }
+    try { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); toast(tr("保存したよ！", "Saved!")); }
+    catch (e) { toast(tr("画像を長押しして保存してね", "Long-press the image to save it")); }
   }, "image/png");
 }
 
 /* ---------- 起動 ---------- */
 $("#back").onclick = home;
-const setMute = () => { $("#mute").textContent = muted ? "音オフ" : "音オン"; $("#mute").setAttribute("aria-pressed", String(!muted)); };
+const setMute = () => { $("#mute").textContent = muted ? tr("音オフ", "Sound off") : tr("音オン", "Sound on"); $("#mute").setAttribute("aria-pressed", String(!muted)); };
 $("#mute").onclick = () => { muted = !muted; store(BRAND.prefix + "mute", muted); setMute(); };
 setMute();
 window.addEventListener("keydown", e => { if (e.key === "Escape" && cur) home(); });
@@ -386,20 +450,20 @@ function boot() {
 const SC = BRAND.c;
 const MONO = '"IBM Plex Mono",ui-monospace,monospace';
 const clampN = (v, a, b) => Math.max(a, Math.min(b, v));
-const sec = s => s.toFixed(1) + "秒";
+const sec = s => s.toFixed(1) + tr("秒", "s");
 const btnRow = (items, cls = "choice") => items.map(([v, t, st]) => `<button class="${cls}" type="button" data-v="${v}" style="${st || ""}">${t}</button>`).join("");
 const panel = (c, html, style = "") => c.el(`<div class="center" style="justify-content:space-between;padding:16px;${style}">${html}</div>`);
 /* 時間制スコアゲーム用のHUD */
 function timed(c, secs, unit, getScore) {
   const t = c.timer(secs, () => c.end(getScore()));
-  t.onTick = left => c.hud(`のこり <b>${left.toFixed(0)}</b>秒`, `<b>${getScore()}</b> ${unit}`);
+  t.onTick = left => c.hud(tr(`のこり <b>${left.toFixed(0)}</b>秒`, `Time <b>${left.toFixed(0)}</b>s`), `<b>${getScore()}</b> ${unit}`);
   return t;
 }
 /* 経過時間スコアゲーム用 */
 function stopwatch(c, left = () => "") {
   const t0 = performance.now(); let pen = 0;
   const w = { get t() { return (performance.now() - t0) / 1000 + pen; }, add(s) { pen += s; } };
-  c.loop(() => c.hud(left(), `<b>${w.t.toFixed(1)}</b> 秒`));
+  c.loop(() => c.hud(left(), tr(`<b>${w.t.toFixed(1)}</b> 秒`, `<b>${w.t.toFixed(1)}</b> s`)));
   return w;
 }
 
@@ -419,19 +483,25 @@ function solve10(nums) {
   return rec(nums);
 }
 game({
-  id: "ten", name: "テンパズル", glyph: "十", color: "#e9c46a",
-  how: "4つの数字を1回ずつ使い、＋−×÷とカッコで10を作ろう。2分で何問解ける？パスは10秒マイナス。",
-  fmt: s => s + "問",
-  ranks: [[12, "数の魔術師"], [9, "切符の達人"], [6, "かなりの切れ者"], [4, "いい調子"], [2, "ふつう"], [0, "まずは1問から"]],
+  id: "ten", name: tr("テンパズル", "Make 10"), glyph: "十", color: "#e9c46a",
+  how: tr("4つの数字を1回ずつ使い、＋−×÷とカッコで10を作ろう。2分で何問解ける？パスは10秒マイナス。", "Use all four numbers once with + − × ÷ and parentheses to make 10. How many can you solve in 2 minutes? Passing costs 10 seconds."),
+  fmt: s => s + tr("問", " solved"),
+  ranks: [[12, tr("数の魔術師", "Number wizard")], [9, tr("切符の達人", "Ticket-puzzle master")], [6, tr("かなりの切れ者", "Razor sharp")], [4, tr("いい調子", "Doing well")], [2, tr("ふつう", "Average")], [0, tr("まずは1問から", "One at a time")]],
   play(c) {
     let score = 0, nums = [], expr = [], used = [];
-    const box = panel(c, `
+    const box = panel(c, tr(`
       <div style="display:flex;gap:10px;justify-content:center" data-nums></div>
       <div data-ex style="min-height:56px;width:100%;border-bottom:1.5px solid ${SC.ink};font-family:${MONO};font-size:clamp(24px,8vw,34px);display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap"></div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%">
         ${btnRow([["+", "＋"], ["-", "−"], ["*", "×"], ["/", "÷"], ["(", "("], [")", ")"], ["back", "1字消す", "font-size:15px"], ["clear", "全部消す", "font-size:15px"]], "choice")}
       </div>
-      <div style="display:flex;gap:10px;width:100%"><button class="btn" type="button" data-v="check" style="flex:1;justify-content:center">判定</button><button class="btn sub" type="button" data-v="pass">パス</button></div>`);
+      <div style="display:flex;gap:10px;width:100%"><button class="btn" type="button" data-v="check" style="flex:1;justify-content:center">判定</button><button class="btn sub" type="button" data-v="pass">パス</button></div>`, `
+      <div style="display:flex;gap:10px;justify-content:center" data-nums></div>
+      <div data-ex style="min-height:56px;width:100%;border-bottom:1.5px solid ${SC.ink};font-family:${MONO};font-size:clamp(24px,8vw,34px);display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap"></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%">
+        ${btnRow([["+", "＋"], ["-", "−"], ["*", "×"], ["/", "÷"], ["(", "("], [")", ")"], ["back", "Undo", "font-size:15px"], ["clear", "Clear", "font-size:15px"]], "choice")}
+      </div>
+      <div style="display:flex;gap:10px;width:100%"><button class="btn" type="button" data-v="check" style="flex:1;justify-content:center">Check</button><button class="btn sub" type="button" data-v="pass">Pass</button></div>`));
     box.querySelectorAll(".choice").forEach(b => { b.style.padding = "10px 4px"; b.style.fontSize = b.style.fontSize || "24px"; });
     const N = box.querySelector("[data-nums]"), EX = box.querySelector("[data-ex]");
     function newQ() {
@@ -442,21 +512,21 @@ game({
       N.innerHTML = nums.map((n, i) => `<button class="cell" type="button" data-n="${i}" style="width:clamp(56px,18vw,72px);height:clamp(56px,18vw,72px);font-size:32px;${used[i] ? "opacity:.25" : ""}">${n}</button>`).join("");
       EX.textContent = expr.map(t => t.s).join(" ") || " ";
     }
-    const t = timed(c, 120, "問", () => score);
+    const t = timed(c, 120, tr("問", " solved"), () => score);
     c.on(box, "pointerdown", e => {
       const n = e.target.closest("[data-n]"), b = e.target.closest("[data-v]"); if (!n && !b) return; e.preventDefault();
       if (n) { const i = +n.dataset.n; if (used[i]) return; used[i] = true; expr.push({ s: String(nums[i]), v: String(nums[i]), i }); c.sfx.tick(); draw(); return; }
       const v = b.dataset.v;
       if (v === "back") { const last = expr.pop(); if (last && last.i !== undefined) used[last.i] = false; draw(); }
       else if (v === "clear") { expr = []; used = [false, false, false, false]; draw(); }
-      else if (v === "pass") { t.penalty(10); c.pop("パス −10秒", SC.accent); newQ(); }
+      else if (v === "pass") { t.penalty(10); c.pop(tr("パス −10秒", "Pass −10s"), SC.accent); newQ(); }
       else if (v === "check") {
-        if (used.some(u => !u)) { c.pop("4つ全部使ってね"); c.sfx.ng(); return; }
-        if (expr.some((tk, k) => k && tk.i !== undefined && expr[k - 1].i !== undefined)) { c.pop("数字は1つずつ使ってね"); c.sfx.ng(); return; }
+        if (used.some(u => !u)) { c.pop(tr("4つ全部使ってね", "Use all four numbers")); c.sfx.ng(); return; }
+        if (expr.some((tk, k) => k && tk.i !== undefined && expr[k - 1].i !== undefined)) { c.pop(tr("数字は1つずつ使ってね", "Put an operator between numbers")); c.sfx.ng(); return; }
         let val = NaN; try { val = Function(`"use strict";return (${expr.map(t => t.v).join("")})`)(); } catch (er) {}
-        if (Math.abs(val - 10) < 1e-9) { score++; c.sfx.ok(score); c.pop("正解！", SC.ok); newQ(); }
-        else { c.sfx.ng(); c.shake(); c.pop(isFinite(val) ? `= ${Math.round(val * 1000) / 1000}` : "式がおかしいよ"); }
-      } else { const sym = { "+": "＋", "-": "−", "*": "×", "/": "÷" }[v] || v; expr.push({ s: sym, v }); c.sfx.tick(); draw(); }
+        if (Math.abs(val - 10) < 1e-9) { score++; c.sfx.ok(score); c.pop(tr("正解！", "Correct!"), SC.ok); newQ(); }
+        else { c.sfx.ng(); c.shake(); c.pop(isFinite(val) ? `= ${Math.round(val * 1000) / 1000}` : tr("式がおかしいよ", "Invalid expression")); }
+      } else { const sym = { "+": tr("＋", "＋"), "-": "−", "*": "×", "/": "÷" }[v] || v; expr.push({ s: sym, v }); c.sfx.tick(); draw(); }
     });
     newQ();
   },
@@ -464,15 +534,17 @@ game({
 
 /* ---------- 02 数列 ---------- */
 game({
-  id: "seq", name: "数列のつづき", glyph: "列", color: "#a8c5da",
-  how: "並んだ数の法則を見抜いて、？に入る数を選ぼう。まちがえると5秒マイナス。90秒。",
-  fmt: s => s + "問",
-  ranks: [[22, "法則ハンター"], [16, "論理派"], [12, "鋭い"], [8, "いい調子"], [4, "ふつう"], [0, "直感派"]],
+  id: "seq", name: tr("数列のつづき", "Number Sequence"), glyph: "列", color: "#a8c5da",
+  how: tr("並んだ数の法則を見抜いて、？に入る数を選ぼう。まちがえると5秒マイナス。90秒。", "Find the rule of the sequence and choose the number that replaces the ?. A wrong answer costs 5 seconds. 90 seconds."),
+  fmt: s => s + tr("問", " solved"),
+  ranks: [[22, tr("法則ハンター", "Pattern hunter")], [16, tr("論理派", "Logical mind")], [12, tr("鋭い", "Sharp")], [8, tr("いい調子", "Doing well")], [4, tr("ふつう", "Average")], [0, tr("直感派", "Intuitive")]],
   play(c) {
     let score = 0, ans = 0;
-    const box = panel(c, `<p class="hint">？に入る数は？</p>
+    const box = panel(c, tr(`<p class="hint">？に入る数は？</p>
       <div data-q style="font-family:${MONO};font-size:clamp(22px,7vw,32px);font-weight:600;line-height:1.5"></div>
-      <div class="row2" data-opts></div>`);
+      <div class="row2" data-opts></div>`, `<p class="hint">Which number replaces the ?</p>
+      <div data-q style="font-family:${MONO};font-size:clamp(22px,7vw,32px);font-weight:600;line-height:1.5"></div>
+      <div class="row2" data-opts></div>`));
     const Q = box.querySelector("[data-q]"), O = box.querySelector("[data-opts]");
     function make() {
       const lv = score, types = lv < 4 ? ["ar", "geo", "ar"] : lv < 9 ? ["ar", "geo", "diff", "sq", "fib"] : ["diff", "sq", "fib", "alt", "lin", "geo", "cube"];
@@ -489,13 +561,13 @@ game({
       const opts = new Set([ans]);
       const near = [ans + 1, ans - 1, ans + 2, ans - 2, s[4] + (s[4] - s[3]), ans + (s[1] - s[0]), ans * 2, ans + 10, ans - 10].filter(v => v !== ans);
       while (opts.size < 4) opts.add(near.length ? near.splice(ri(0, near.length - 1), 1)[0] : ans + ri(3, 20));
-      Q.textContent = s.slice(0, 5).join(",  ") + ",  ？";
+      Q.textContent = s.slice(0, 5).join(",  ") + tr(",  ？", ",  ?");
       O.innerHTML = btnRow(shuffle([...opts]).map(v => [v, v, `font-family:${MONO}`]));
     }
-    const t = timed(c, 90, "問", () => score);
+    const t = timed(c, 90, tr("問", " solved"), () => score);
     c.on(O, "pointerdown", e => {
       const b = e.target.closest("[data-v]"); if (!b) return; e.preventDefault();
-      if (+b.dataset.v === ans) { score++; c.sfx.ok(score % 12); } else { t.penalty(5); c.sfx.ng(); c.shake(); c.pop(`正解は ${ans}`, SC.accent); }
+      if (+b.dataset.v === ans) { score++; c.sfx.ok(score % 12); } else { t.penalty(5); c.sfx.ng(); c.shake(); c.pop(tr(`正解は ${ans}`, `Answer: ${ans}`), SC.accent); }
       make();
     });
     make();
@@ -504,10 +576,10 @@ game({
 
 /* ---------- 03 ミニナンプレ 6×6 ---------- */
 game({
-  id: "sudoku", name: "ナンプレ6×6", glyph: "六", color: "#b7c9a8", lower: true,
-  how: "どの行・列・太枠（2×3）にも1〜6が1つずつ入るように埋めよう。まちがえると5秒プラス。",
+  id: "sudoku", name: tr("ナンプレ6×6", "Sudoku 6×6"), glyph: "六", color: "#b7c9a8", lower: true,
+  how: tr("どの行・列・太枠（2×3）にも1〜6が1つずつ入るように埋めよう。まちがえると5秒プラス。", "Fill the grid so every row, column and bold box (2×3) has 1–6 exactly once. A wrong entry adds 5 seconds."),
   fmt: sec,
-  ranks: [[90, "パズル職人"], [150, "かなり速い"], [220, "いい調子"], [320, "ふつう"], [480, "じっくり派"], [99999, "ゆったり派"]],
+  ranks: [[90, tr("パズル職人", "Puzzle artisan")], [150, tr("かなり速い", "Very fast")], [220, tr("いい調子", "Doing well")], [320, tr("ふつう", "Average")], [480, tr("じっくり派", "Takes it slow")], [99999, tr("ゆったり派", "Relaxed")]],
   play(c) {
     const N = 6, BR = 2, BC = 3;
     const ok = (g, r, k, v) => { for (let i = 0; i < N; i++) if (g[r * N + i] === v || g[i * N + k] === v) return false; const r0 = r - r % BR, c0 = k - k % BC; for (let i = 0; i < BR; i++) for (let j = 0; j < BC; j++) if (g[(r0 + i) * N + c0 + j] === v) return false; return true; };
@@ -520,7 +592,7 @@ game({
     const box = panel(c, `<div class="grid" data-g style="position:relative;left:auto;top:auto;transform:none;width:min(100%,calc(var(--sh) - 150px));grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(6,1fr);gap:0;border:2.5px solid ${SC.ink}"></div>
       <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;width:100%">${btnRow([1, 2, 3, 4, 5, 6].map(n => [n, n, `padding:12px 0;font-family:${MONO}`]))}</div>`);
     const G = box.querySelector("[data-g]");
-    const w = stopwatch(c, () => `のこり <b>${puz.filter(v => !v).length}</b> マス`);
+    const w = stopwatch(c, () => tr(`のこり <b>${puz.filter(v => !v).length}</b> マス`, `<b>${puz.filter(v => !v).length}</b> cells left`));
     function draw() {
       G.innerHTML = puz.map((v, i) => {
         const r = Math.floor(i / N), k = i % N;
@@ -533,7 +605,7 @@ game({
       const b = e.target.closest("[data-v]"); if (!b || sel < 0 || given[sel]) return; e.preventDefault();
       const v = +b.dataset.v;
       if (sol[sel] === v) { puz[sel] = v; given[sel] = true; c.sfx.ok(36 - puz.filter(x => !x).length); const nx = puz.indexOf(0); sel = nx; draw(); if (nx < 0) c.end(Math.round(w.t * 10) / 10); }
-      else { w.add(5); c.sfx.ng(); c.shake(); c.pop("+5秒", SC.accent); }
+      else { w.add(5); c.sfx.ng(); c.shake(); c.pop(tr("+5秒", "+5s"), SC.accent); }
     });
     draw();
   },
@@ -541,14 +613,14 @@ game({
 
 /* ---------- 04 ライツアウト ---------- */
 game({
-  id: "lights", name: "ライツアウト", glyph: "灯", color: "#f2b880", lower: true,
-  how: "マスを押すと、そのマスと上下左右の明かりが反転するよ。全部消そう。3×3→4×4→5×5の3面の合計タイム。",
+  id: "lights", name: tr("ライツアウト", "Lights Out"), glyph: "灯", color: "#f2b880", lower: true,
+  how: tr("マスを押すと、そのマスと上下左右の明かりが反転するよ。全部消そう。3×3→4×4→5×5の3面の合計タイム。", "Tapping a cell flips it and its neighbors above, below, left and right. Turn every light off. Total time over 3×3, 4×4 and 5×5 boards."),
   fmt: sec,
-  ranks: [[40, "完全攻略"], [70, "ひらめき型"], [110, "いい調子"], [170, "ふつう"], [260, "試行錯誤派"], [99999, "迷宮入り"]],
+  ranks: [[40, tr("完全攻略", "Fully solved")], [70, tr("ひらめき型", "Flash of insight")], [110, tr("いい調子", "Doing well")], [170, tr("ふつう", "Average")], [260, tr("試行錯誤派", "Trial and error")], [99999, tr("迷宮入り", "Lost in the maze")]],
   play(c) {
     let n = 3, stage = 0, L = [], moves = 0;
     const g = c.el(`<div class="grid"></div>`);
-    const w = stopwatch(c, () => `面 <b>${stage + 1}</b>/3　手数 <b>${moves}</b>`);
+    const w = stopwatch(c, () => tr(`面 <b>${stage + 1}</b>/3　手数 <b>${moves}</b>`, `Board <b>${stage + 1}</b>/3　Moves <b>${moves}</b>`));
     const press = (A, i) => { const r = Math.floor(i / n), k = i % n; [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dr, dk]) => { const rr = r + dr, kk = k + dk; if (rr >= 0 && kk >= 0 && rr < n && kk < n) A[rr * n + kk] ^= 1; }); };
     function level() {
       n = [3, 4, 5][stage]; L = Array(n * n).fill(0); moves = 0;
@@ -560,7 +632,7 @@ game({
     c.on(g, "pointerdown", e => {
       const b = e.target.closest("[data-i]"); if (!b) return; e.preventDefault();
       press(L, +b.dataset.i); moves++; c.sfx.tick(); draw();
-      if (L.every(v => !v)) { stage++; c.sfx.ok(stage * 4); if (stage >= 3) c.end(Math.round(w.t * 10) / 10); else { c.pop(`${stage}面クリア`); c.after(500, level); } }
+      if (L.every(v => !v)) { stage++; c.sfx.ok(stage * 4); if (stage >= 3) c.end(Math.round(w.t * 10) / 10); else { c.pop(tr(`${stage}面クリア`, `Board ${stage} cleared`)); c.after(500, level); } }
     });
     level();
   },
@@ -568,17 +640,17 @@ game({
 
 /* ---------- 05 8パズル ---------- */
 game({
-  id: "slide", name: "8パズル", glyph: "滑", color: "#c9b6e4", lower: true,
-  how: "空いたマスに数字をスライドさせて、1〜8の順に並べよう。左上から1,2,3…、右下が空き。",
+  id: "slide", name: tr("8パズル", "8-Puzzle"), glyph: "滑", color: "#c9b6e4", lower: true,
+  how: tr("空いたマスに数字をスライドさせて、1〜8の順に並べよう。左上から1,2,3…、右下が空き。", "Slide the tiles into the empty space to put them in order: 1, 2, 3… from the top left, with the bottom right empty."),
   fmt: sec,
-  ranks: [[25, "スライドの鬼"], [45, "かなり速い"], [70, "いい調子"], [110, "ふつう"], [180, "じっくり派"], [99999, "迷い中"]],
+  ranks: [[25, tr("スライドの鬼", "Slide demon")], [45, tr("かなり速い", "Very fast")], [70, tr("いい調子", "Doing well")], [110, tr("ふつう", "Average")], [180, tr("じっくり派", "Takes it slow")], [99999, tr("迷い中", "Still wandering")]],
   play(c) {
     let B = [1, 2, 3, 4, 5, 6, 7, 8, 0], moves = 0, last = -1;
     const nb = i => [i - 3, i + 3, i % 3 ? i - 1 : -1, i % 3 < 2 ? i + 1 : -1].filter(j => j >= 0 && j < 9);
     for (let k = 0; k < 80; k++) { const z = B.indexOf(0), opts = nb(z).filter(j => j !== last); const j = pick(opts); last = z; [B[z], B[j]] = [B[j], B[z]]; }
     if (B.join() === "1,2,3,4,5,6,7,8,0") { [B[7], B[8]] = [B[8], B[7]]; [B[6], B[7]] = [B[7], B[6]]; }
     const g = c.el(`<div class="grid" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr)"></div>`);
-    const w = stopwatch(c, () => `手数 <b>${moves}</b>`);
+    const w = stopwatch(c, () => tr(`手数 <b>${moves}</b>`, `Moves <b>${moves}</b>`));
     const draw = () => g.innerHTML = B.map((v, i) => v ? `<button class="cell" type="button" data-i="${i}" style="font-size:clamp(28px,10vw,44px);background:${v === i + 1 ? "#e4d8f2" : SC.bg}">${v}</button>` : `<span></span>`).join("");
     c.on(g, "pointerdown", e => {
       const b = e.target.closest("[data-i]"); if (!b) return; e.preventDefault();
@@ -592,22 +664,25 @@ game({
 
 /* ---------- 06 数字記憶 ---------- */
 game({
-  id: "span", name: "数字の記憶", glyph: "憶", color: "#e8a0a0",
-  how: "表示される数字を覚えて、消えたら同じ順に入力しよう。正解するたび1桁ずつ増える。同じ桁で2回まちがえたら終わり。",
-  fmt: s => s + "桁",
-  ranks: [[12, "記憶の怪物"], [10, "写真記憶"], [8, "かなり強い"], [7, "平均以上"], [5, "ふつう"], [0, "メモ派"]],
+  id: "span", name: tr("数字の記憶", "Digit Span"), glyph: "憶", color: "#e8a0a0",
+  how: tr("表示される数字を覚えて、消えたら同じ順に入力しよう。正解するたび1桁ずつ増える。同じ桁で2回まちがえたら終わり。", "Memorize the digits, then enter them in the same order when they disappear. Each success adds one digit. Two misses at the same length ends the game."),
+  fmt: s => s + tr("桁", " digits"),
+  ranks: [[12, tr("記憶の怪物", "Memory monster")], [10, tr("写真記憶", "Photographic memory")], [8, tr("かなり強い", "Very strong")], [7, tr("平均以上", "Above average")], [5, tr("ふつう", "Average")], [0, tr("メモ派", "Takes notes")]],
   play(c) {
     let len = 4, best = 0, miss = 0, target = "", input = "", phase = "show";
-    const box = panel(c, `<div data-d style="font-family:${MONO};font-size:clamp(30px,10vw,48px);font-weight:600;letter-spacing:.12em;min-height:1.4em;word-break:break-all"></div>
+    const box = panel(c, tr(`<div data-d style="font-family:${MONO};font-size:clamp(30px,10vw,48px);font-weight:600;letter-spacing:.12em;min-height:1.4em;word-break:break-all"></div>
       <p class="hint" data-m></p>
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;width:100%">${btnRow([1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map(n => [n, n, `padding:12px 0;font-family:${MONO}`]))}</div>
-      <div style="display:flex;gap:10px;width:100%"><button class="btn sub" type="button" data-v="bs">1字消す</button><button class="btn" type="button" data-v="ok" style="flex:1;justify-content:center">決定</button></div>`);
+      <div style="display:flex;gap:10px;width:100%"><button class="btn sub" type="button" data-v="bs">1字消す</button><button class="btn" type="button" data-v="ok" style="flex:1;justify-content:center">決定</button></div>`, `<div data-d style="font-family:${MONO};font-size:clamp(30px,10vw,48px);font-weight:600;letter-spacing:.12em;min-height:1.4em;word-break:break-all"></div>
+      <p class="hint" data-m></p>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;width:100%">${btnRow([1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map(n => [n, n, `padding:12px 0;font-family:${MONO}`]))}</div>
+      <div style="display:flex;gap:10px;width:100%"><button class="btn sub" type="button" data-v="bs">Undo</button><button class="btn" type="button" data-v="ok" style="flex:1;justify-content:center">OK</button></div>`));
     const D = box.querySelector("[data-d]"), M = box.querySelector("[data-m]");
-    const upd = () => c.hud(`<b>${len}</b> 桁に挑戦`, `ミス <b>${miss}</b>/2`);
+    const upd = () => c.hud(tr(`<b>${len}</b> 桁に挑戦`, `<b>${len}</b> digits`), tr(`ミス <b>${miss}</b>/2`, `Misses <b>${miss}</b>/2`));
     function round() {
       target = Array.from({ length: len }, (_, i) => ri(i ? 0 : 1, 9)).join(""); input = ""; phase = "show";
-      D.textContent = target; M.textContent = "覚えて…"; upd();
-      c.after(900 + len * 450, () => { phase = "input"; D.textContent = "・".repeat(len); M.textContent = "同じ順に入力"; });
+      D.textContent = target; M.textContent = tr("覚えて…", "Memorize…"); upd();
+      c.after(900 + len * 450, () => { phase = "input"; D.textContent = tr("・", "・").repeat(len); M.textContent = tr("同じ順に入力", "Enter them in order"); });
     }
     c.on(box, "pointerdown", e => {
       const b = e.target.closest("[data-v]"); if (!b || phase !== "input") return; e.preventDefault();
@@ -616,11 +691,11 @@ game({
       else if (v === "ok") {
         if (input.length < len) return;
         phase = "judge";
-        if (input === target) { best = len; len++; miss = 0; c.sfx.ok(len); M.textContent = "正解！"; c.after(700, round); }
-        else { miss++; c.sfx.ng(); c.shake(); M.textContent = `正解は ${target}`; if (miss >= 2) c.after(1400, () => c.end(best)); else c.after(1400, round); }
+        if (input === target) { best = len; len++; miss = 0; c.sfx.ok(len); M.textContent = tr("正解！", "Correct!"); c.after(700, round); }
+        else { miss++; c.sfx.ng(); c.shake(); M.textContent = tr(`正解は ${target}`, `Answer: ${target}`); if (miss >= 2) c.after(1400, () => c.end(best)); else c.after(1400, round); }
         return;
       } else if (input.length < len) { input += v; c.sfx.tick(); }
-      D.textContent = (input + "・".repeat(len - input.length));
+      D.textContent = (input + tr("・", "・").repeat(len - input.length));
     });
     round();
   },
@@ -628,13 +703,13 @@ game({
 
 /* ---------- 07 論理推理 ---------- */
 game({
-  id: "logic", name: "順位推理", glyph: "推", color: "#9fc2b0",
-  how: "条件を読んで、質問に合う人を選ぼう。人数と条件はだんだん増えるよ。まちがえると5秒マイナス。90秒。",
-  fmt: s => s + "問",
-  ranks: [[16, "名探偵"], [12, "論理の人"], [9, "鋭い"], [6, "いい調子"], [3, "ふつう"], [0, "直感派"]],
+  id: "logic", name: tr("順位推理", "Who's First?"), glyph: "推", color: "#9fc2b0",
+  how: tr("条件を読んで、質問に合う人を選ぼう。人数と条件はだんだん増えるよ。まちがえると5秒マイナス。90秒。", "Read the clues and pick the person who fits the question. People and clues increase as you go. A wrong answer costs 5 seconds. 90 seconds."),
+  fmt: s => s + tr("問", " solved"),
+  ranks: [[16, tr("名探偵", "Master detective")], [12, tr("論理の人", "Logician")], [9, tr("鋭い", "Sharp")], [6, tr("いい調子", "Doing well")], [3, tr("ふつう", "Average")], [0, tr("直感派", "Intuitive")]],
   play(c) {
-    const NAMES = ["佐藤", "鈴木", "高橋", "田中", "伊藤", "渡辺", "山本", "中村"];
-    const ATTR = [["背が高い", "背が低い", "一番背が高い", "一番背が低い", "2番目に背が高い"], ["年上", "年下", "一番年上", "一番年下", "2番目に年上"], ["足が速い", "足が遅い", "一番足が速い", "一番足が遅い", "2番目に足が速い"]];
+    const NAMES = [tr("佐藤", "Alex"), tr("鈴木", "Ben"), tr("高橋", "Chloe"), tr("田中", "Dan"), tr("伊藤", "Emma"), tr("渡辺", "Finn"), tr("山本", "Grace"), tr("中村", "Hana")];
+    const ATTR = [[tr("背が高い", "taller"), tr("背が低い", "shorter"), tr("一番背が高い", "the tallest"), tr("一番背が低い", "the shortest"), tr("2番目に背が高い", "the 2nd tallest")], [tr("年上", "older"), tr("年下", "younger"), tr("一番年上", "the oldest"), tr("一番年下", "the youngest"), tr("2番目に年上", "the 2nd oldest")], [tr("足が速い", "faster"), tr("足が遅い", "slower"), tr("一番足が速い", "the fastest"), tr("一番足が遅い", "the slowest"), tr("2番目に足が速い", "the 2nd fastest")]];
     let score = 0, ans = "";
     const box = panel(c, `<div data-s style="text-align:left;width:100%;font-size:17px;line-height:1.9;font-weight:700"></div>
       <p data-q style="font-family:${BRAND.fd};font-size:22px;font-weight:800"></p>
@@ -644,18 +719,18 @@ game({
       const n = score < 4 ? 3 : score < 9 ? 4 : 5, at = pick(ATTR);
       const ppl = shuffle(NAMES.slice()).slice(0, n); // ppl[0]が最も上
       const facts = [];
-      for (let i = 0; i < n - 1; i++) facts.push(Math.random() < .5 ? `${ppl[i]}さんは${ppl[i + 1]}さんより${at[0]}` : `${ppl[i + 1]}さんは${ppl[i]}さんより${at[1]}`);
-      if (n >= 4 && Math.random() < .6) { const i = ri(0, n - 3), j = ri(i + 2, n - 1); facts.push(`${ppl[i]}さんは${ppl[j]}さんより${at[0]}`); }
+      for (let i = 0; i < n - 1; i++) facts.push(Math.random() < .5 ? tr(`${ppl[i]}さんは${ppl[i + 1]}さんより${at[0]}`, `${ppl[i]} is ${at[0]} than ${ppl[i + 1]}`) : tr(`${ppl[i + 1]}さんは${ppl[i]}さんより${at[1]}`, `${ppl[i + 1]} is ${at[1]} than ${ppl[i]}`));
+      if (n >= 4 && Math.random() < .6) { const i = ri(0, n - 3), j = ri(i + 2, n - 1); facts.push(tr(`${ppl[i]}さんは${ppl[j]}さんより${at[0]}`, `${ppl[i]} is ${at[0]} than ${ppl[j]}`)); }
       const qk = n >= 4 ? ri(2, 4) : ri(2, 3);
       ans = qk === 2 ? ppl[0] : qk === 3 ? ppl[n - 1] : ppl[1];
-      S.innerHTML = shuffle(facts).map(f => `・${f}`).join("<br>");
-      Q.textContent = `${at[qk]}のは？`;
-      O.innerHTML = btnRow(shuffle(ppl.slice()).map(p => [p, p + "さん", "font-size:20px;padding:12px 4px"]));
+      S.innerHTML = shuffle(facts).map(f => tr(`・${f}`, `・${f}`)).join("<br>");
+      Q.textContent = tr(`${at[qk]}のは？`, `Who is ${at[qk]}?`);
+      O.innerHTML = btnRow(shuffle(ppl.slice()).map(p => [p, p + tr("さん", ""), "font-size:20px;padding:12px 4px"]));
     }
-    const t = timed(c, 90, "問", () => score);
+    const t = timed(c, 90, tr("問", " solved"), () => score);
     c.on(O, "pointerdown", e => {
       const b = e.target.closest("[data-v]"); if (!b) return; e.preventDefault();
-      if (b.dataset.v === ans) { score++; c.sfx.ok(score % 12); } else { t.penalty(5); c.sfx.ng(); c.shake(); c.pop(`正解は${ans}さん`, SC.accent); }
+      if (b.dataset.v === ans) { score++; c.sfx.ok(score % 12); } else { t.penalty(5); c.sfx.ng(); c.shake(); c.pop(tr(`正解は${ans}さん`, `Answer: ${ans}`), SC.accent); }
       make();
     });
     make();
@@ -664,22 +739,24 @@ game({
 
 /* ---------- 08 2バック ---------- */
 game({
-  id: "nback", name: "2バック", glyph: "二", color: "#d6b98c",
-  how: "文字が1つずつ表示されるよ。「2つ前と同じ文字」が出たら一致ボタン。脳のワーキングメモリを鍛える定番トレーニング。30問。",
+  id: "nback", name: tr("2バック", "2-Back"), glyph: "二", color: "#d6b98c",
+  how: tr("文字が1つずつ表示されるよ。「2つ前と同じ文字」が出たら一致ボタン。脳のワーキングメモリを鍛える定番トレーニング。30問。", "Letters appear one at a time. Press Match when the letter is the same as the one two steps back. A classic working-memory workout. 30 letters."),
   fmt: s => s.toFixed(0) + "%",
-  ranks: [[97, "超集中"], [90, "記憶エンジン"], [82, "かなり強い"], [74, "いい調子"], [65, "ふつう"], [0, "メモリ不足"]],
+  ranks: [[97, tr("超集中", "Laser focus")], [90, tr("記憶エンジン", "Memory engine")], [82, tr("かなり強い", "Very strong")], [74, tr("いい調子", "Doing well")], [65, tr("ふつう", "Average")], [0, tr("メモリ不足", "Out of memory")]],
   play(c) {
-    const L = ["カ", "キ", "ク", "ケ", "コ", "サ"], TOT = 30;
+    const L = [tr("カ", "K"), tr("キ", "H"), tr("ク", "T"), tr("ケ", "R"), tr("コ", "S"), tr("サ", "N")], TOT = 30;
     const seq = [];
     for (let i = 0; i < TOT; i++) seq.push(i >= 2 && Math.random() < .33 ? seq[i - 2] : pick(L.filter(x => i < 2 || x !== seq[i - 2])));
     let i = -1, pressed = false, right = 0, judged = 0;
-    const box = panel(c, `<p class="hint">2つ前と同じなら「一致」</p>
+    const box = panel(c, tr(`<p class="hint">2つ前と同じなら「一致」</p>
       <div data-l style="font-family:${BRAND.fd};font-size:clamp(90px,30vw,140px);font-weight:800;line-height:1;min-height:1.1em"></div>
-      <button class="btn" type="button" data-v="m" style="width:100%;justify-content:center;font-size:22px;padding:18px">一致</button>`);
+      <button class="btn" type="button" data-v="m" style="width:100%;justify-content:center;font-size:22px;padding:18px">一致</button>`, `<p class="hint">Same as two back? Press Match</p>
+      <div data-l style="font-family:${BRAND.fd};font-size:clamp(90px,30vw,140px);font-weight:800;line-height:1;min-height:1.1em"></div>
+      <button class="btn" type="button" data-v="m" style="width:100%;justify-content:center;font-size:22px;padding:18px">Match</button>`));
     const Lb = box.querySelector("[data-l]"), Bt = box.querySelector("[data-v]");
     const isMatch = k => k >= 2 && seq[k] === seq[k - 2];
-    const upd = () => c.hud(`<b>${Math.max(0, i + 1)}</b> / ${TOT}`, judged ? `正答率 <b>${Math.round(right / judged * 100)}</b>%` : "");
-    function judge() { if (i < 2) return; judged++; if (pressed === isMatch(i)) right++; else if (!pressed) c.pop("見逃し", SC.accent); upd(); }
+    const upd = () => c.hud(`<b>${Math.max(0, i + 1)}</b> / ${TOT}`, judged ? tr(`正答率 <b>${Math.round(right / judged * 100)}</b>%`, `Accuracy <b>${Math.round(right / judged * 100)}</b>%`) : "");
+    function judge() { if (i < 2) return; judged++; if (pressed === isMatch(i)) right++; else if (!pressed) c.pop(tr("見逃し", "Missed"), SC.accent); upd(); }
     function step() {
       if (i >= 0) judge();
       i++; if (i >= TOT) { c.end(Math.round(right / judged * 100)); return; }
@@ -696,10 +773,10 @@ game({
 
 /* ---------- 09 図形回転 ---------- */
 game({
-  id: "rotate", name: "図形回転", glyph: "回", color: "#b3c7e6",
-  how: "右の図形は、左を回転させただけ？それとも裏返し（鏡像）？頭の中で回して答えよう。まちがえると5秒マイナス。60秒。",
-  fmt: s => s + "問",
-  ranks: [[22, "空間認識の鬼"], [16, "設計士の頭"], [12, "鋭い"], [8, "いい調子"], [4, "ふつう"], [0, "目が回る"]],
+  id: "rotate", name: tr("図形回転", "Rotate or Mirror"), glyph: "回", color: "#b3c7e6",
+  how: tr("右の図形は、左を回転させただけ？それとも裏返し（鏡像）？頭の中で回して答えよう。まちがえると5秒マイナス。60秒。", "Is the right shape just the left one rotated, or is it flipped (a mirror image)? Rotate it in your head. A wrong answer costs 5 seconds. 60 seconds."),
+  fmt: s => s + tr("問", " solved"),
+  ranks: [[22, tr("空間認識の鬼", "Spatial genius")], [16, tr("設計士の頭", "Architect's mind")], [12, tr("鋭い", "Sharp")], [8, tr("いい調子", "Doing well")], [4, tr("ふつう", "Average")], [0, tr("目が回る", "Getting dizzy")]],
   play(c) {
     const { x, W, H } = c.canvas();
     let score = 0, A = [], Bp = [], mirror = false, rot = 0;
@@ -720,11 +797,11 @@ game({
       A = shape(); mirror = Math.random() < .5; rot = ri(1, 3);
       let P = mirror ? mir(A) : A; for (let k = 0; k < rot; k++) P = r90(P); Bp = norm(P); A = norm(A);
     }
-    const t = timed(c, 60, "問", () => score);
-    const ansBtn = c.el(`<div class="row2" style="position:absolute;left:16px;right:16px;bottom:16px;width:auto">${btnRow([["0", "回転"], ["1", "鏡像"]])}</div>`);
+    const t = timed(c, 60, tr("問", " solved"), () => score);
+    const ansBtn = c.el(tr(`<div class="row2" style="position:absolute;left:16px;right:16px;bottom:16px;width:auto">${btnRow([["0", "回転"], ["1", "鏡像"]])}</div>`, `<div class="row2" style="position:absolute;left:16px;right:16px;bottom:16px;width:auto">${btnRow([["0", "Rotated"], ["1", "Mirrored"]])}</div>`));
     c.on(ansBtn, "pointerdown", e => {
       const b = e.target.closest("[data-v]"); if (!b) return; e.preventDefault();
-      if ((b.dataset.v === "1") === mirror) { score++; c.sfx.ok(score % 12); } else { t.penalty(5); c.sfx.ng(); c.shake(); c.pop(mirror ? "正解は鏡像" : "正解は回転", SC.accent); }
+      if ((b.dataset.v === "1") === mirror) { score++; c.sfx.ok(score % 12); } else { t.penalty(5); c.sfx.ng(); c.shake(); c.pop(mirror ? tr("正解は鏡像", "It was mirrored") : tr("正解は回転", "It was rotated"), SC.accent); }
       make();
     });
     make();
@@ -739,27 +816,28 @@ game({
       const cy = (H - 90) / 2;
       drawP(A, W * .25, cy, "#b3c7e6"); drawP(Bp, W * .75, cy, "#e9c46a");
       x.strokeStyle = "rgba(31,42,58,.2)"; x.beginPath(); x.moveTo(W / 2, 30); x.lineTo(W / 2, H - 110); x.stroke();
-      x.fillStyle = SC.muted; x.font = `700 14px ${BRAND.fb}`; x.textAlign = "center"; x.fillText("もとの形", W * .25, 28); x.fillText("これは？", W * .75, 28);
+      x.fillStyle = SC.muted; x.font = `700 14px ${BRAND.fb}`; x.textAlign = "center"; x.fillText(tr("もとの形", "Original"), W * .25, 28); x.fillText(tr("これは？", "This one?"), W * .75, 28);
     });
   },
 });
 
 /* ---------- 10 マインスイーパー ---------- */
 game({
-  id: "mines", name: "マインスイーパー", glyph: "雷", color: "#d4a5a5", lower: true,
-  how: "数字は周りの8マスにある地雷の数。地雷以外を全部開けよう。旗ボタンで旗モード、長押しでも旗が立つよ。9×9・地雷10個。",
-  fmt: s => s >= 9999 ? "爆発" : sec(s),
-  ranks: [[30, "伝説の掃除屋"], [60, "上級者"], [100, "中級者"], [160, "いい調子"], [300, "慎重派"], [99999, "爆発"]],
+  id: "mines", name: tr("マインスイーパー", "Minesweeper"), glyph: "雷", color: "#d4a5a5", lower: true,
+  how: tr("数字は周りの8マスにある地雷の数。地雷以外を全部開けよう。旗ボタンで旗モード、長押しでも旗が立つよ。9×9・地雷10個。", "Numbers show how many mines touch that cell. Open every cell without a mine. Use the flag button or long-press to place a flag. 9×9 with 10 mines."),
+  fmt: s => s >= 9999 ? tr("爆発", "Boom") : sec(s),
+  ranks: [[30, tr("伝説の掃除屋", "Legendary sweeper")], [60, tr("上級者", "Expert")], [100, tr("中級者", "Intermediate")], [160, tr("いい調子", "Doing well")], [300, tr("慎重派", "Careful")], [99999, tr("爆発", "Boom")]],
   play(c) {
     const N = 9, M = 10; let mine = null, open = Array(N * N).fill(false), flag = Array(N * N).fill(false), flagMode = false, over = false, t0 = 0, started = false;
     const nbr = i => { const r = Math.floor(i / N), k = i % N, o = []; for (let dr = -1; dr <= 1; dr++) for (let dk = -1; dk <= 1; dk++) { if (!dr && !dk) continue; const rr = r + dr, kk = k + dk; if (rr >= 0 && kk >= 0 && rr < N && kk < N) o.push(rr * N + kk); } return o; };
     const cnt = i => nbr(i).filter(j => mine[j]).length;
-    const box = panel(c, `<div class="grid" data-g style="position:relative;left:auto;top:auto;transform:none;width:min(100%,calc(var(--sh) - 90px));grid-template-columns:repeat(9,1fr);grid-template-rows:repeat(9,1fr);gap:2px"></div>
-      <button class="btn sub" type="button" data-f style="width:100%;justify-content:center">旗モード：オフ</button>`);
+    const box = panel(c, tr(`<div class="grid" data-g style="position:relative;left:auto;top:auto;transform:none;width:min(100%,calc(var(--sh) - 90px));grid-template-columns:repeat(9,1fr);grid-template-rows:repeat(9,1fr);gap:2px"></div>
+      <button class="btn sub" type="button" data-f style="width:100%;justify-content:center">旗モード：オフ</button>`, `<div class="grid" data-g style="position:relative;left:auto;top:auto;transform:none;width:min(100%,calc(var(--sh) - 90px));grid-template-columns:repeat(9,1fr);grid-template-rows:repeat(9,1fr);gap:2px"></div>
+      <button class="btn sub" type="button" data-f style="width:100%;justify-content:center">Flag mode: off</button>`));
     const G = box.querySelector("[data-g]"), F = box.querySelector("[data-f]");
     const COL = ["", "#2f6db0", "#3f7d58", "#c4452f", "#5b3f8c", "#8a3b1d", "#2a7a7a", "#1f2a3a", "#6b6457"];
     const time = () => started ? (performance.now() - t0) / 1000 : 0;
-    c.loop(() => c.hud(`旗 <b>${flag.filter(Boolean).length}</b> / ${M}`, `<b>${time().toFixed(1)}</b> 秒`));
+    c.loop(() => c.hud(tr(`旗 <b>${flag.filter(Boolean).length}</b> / ${M}`, `Flags <b>${flag.filter(Boolean).length}</b> / ${M}`), tr(`<b>${time().toFixed(1)}</b> 秒`, `<b>${time().toFixed(1)}</b> s`)));
     function place(safe) {
       mine = Array(N * N).fill(false); const ban = new Set([safe, ...nbr(safe)]);
       shuffle([...Array(N * N).keys()].filter(i => !ban.has(i))).slice(0, M).forEach(i => mine[i] = true);
@@ -767,7 +845,7 @@ game({
     function reveal(i) { if (open[i] || flag[i]) return; open[i] = true; if (!mine[i] && cnt(i) === 0) nbr(i).forEach(reveal); }
     function draw() {
       G.innerHTML = open.map((o, i) => {
-        if (!o) return `<button type="button" data-i="${i}" style="all:unset;cursor:pointer;background:#d9cfbb;border:1px solid rgba(31,42,58,.35);border-radius:3px;display:grid;place-items:center;font-weight:800;color:${SC.accent};font-size:clamp(12px,3.6vw,18px)">${flag[i] ? "旗" : over && mine[i] ? "●" : ""}</button>`;
+        if (!o) return tr(`<button type="button" data-i="${i}" style="all:unset;cursor:pointer;background:#d9cfbb;border:1px solid rgba(31,42,58,.35);border-radius:3px;display:grid;place-items:center;font-weight:800;color:${SC.accent};font-size:clamp(12px,3.6vw,18px)">${flag[i] ? "旗" : over && mine[i] ? "●" : ""}</button>`, `<button type="button" data-i="${i}" style="all:unset;cursor:pointer;background:#d9cfbb;border:1px solid rgba(31,42,58,.35);border-radius:3px;display:grid;place-items:center;font-weight:800;color:${SC.accent};font-size:clamp(12px,3.6vw,18px)">${flag[i] ? "⚑" : over && mine[i] ? "●" : ""}</button>`);
         if (mine[i]) return `<span style="background:${SC.accent};border-radius:3px;display:grid;place-items:center;color:#fff;font-weight:800">●</span>`;
         const n = cnt(i); return `<span style="background:${SC.bg};border:1px solid rgba(31,42,58,.12);border-radius:3px;display:grid;place-items:center;font-family:${MONO};font-weight:600;color:${COL[n]};font-size:clamp(12px,3.8vw,19px)">${n || ""}</span>`;
       }).join("");
@@ -786,12 +864,14 @@ game({
     c.every(80, () => { if (pressI >= 0 && !longDone && performance.now() - pressT > 450) { longDone = true; act(pressI, true); buzz(20); } });
     c.on(window, "pointerup", () => { if (pressI < 0) return; const i = pressI; pressI = -1; if (!longDone) act(i, flagMode); });
     c.on(G, "contextmenu", e => e.preventDefault());
-    c.on(F, "click", () => { flagMode = !flagMode; F.textContent = `旗モード：${flagMode ? "オン" : "オフ"}`; F.style.background = flagMode ? "#f0d2a8" : ""; });
+    c.on(F, "click", () => { flagMode = !flagMode; F.textContent = tr(`旗モード：${flagMode ? "オン" : "オフ"}`, `Flag mode: ${flagMode ? "on" : "off"}`); F.style.background = flagMode ? "#f0d2a8" : ""; });
     draw();
   },
 });
 
 boot();
+window.go = go; window.GAMES = GAMES; Object.defineProperty(window, "ctx", { get: () => ctx }); Object.defineProperty(window, "cur", { get: () => cur });
+});
 </script>
 </body>
 </html>
